@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 import string
 import random
 
@@ -29,6 +30,9 @@ def shortner(long_url: str):
 
 @app.get("/{code}")
 def get_url(code: str):
-    return {
-        "long_url": url.get(code)
-    }
+    long_url= url.get(code)
+   
+    if long_url:
+        return RedirectResponse(long_url)
+
+    return {"error": "Invalid code"}
