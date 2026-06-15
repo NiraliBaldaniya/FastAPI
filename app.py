@@ -1,22 +1,16 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, RedirectResponse
+from db import sessionlocal, engine
+from models import Url,base
 import string
 import random
-import qrcode
-import base64
-import os
-import json
-from io import BytesIO
 from datetime import datetime
 
 
-app = FastAPI()
+base.metadata.create_all(bind=engine)
 
-try:
-    with open("data.json", "r") as file:
-        url = json.load(file)
-except:
-    url = {}
+
+app = FastAPI()
 
 def render_home(short_url=None):
     result_html = ""
@@ -189,9 +183,9 @@ def render_home(short_url=None):
         <div class="navbar">
         <div class="logo">🔗 URL Shortener</div>
         <div class="nav-links">
-           <a href="#">Home</a>
-           <a href="/all">My Links</a>
-           <a href="#">About</a>
+           <a href="#"> Home</a>
+           <a href="/all"> My Links</a>
+           <a href="#"> About</a>
         </div>
         </div>
             <h1>URL Shortener</h1>
@@ -231,24 +225,19 @@ def shortner(long_url: str):
         )
    )
 
-    url[code] = {
-        "long_url": long_url,
-        "created_at": datetime.now().strftime("%d-%m-%y %H:%M:%S")
-    }
+    db = sessionlocal()
 
-    with open("data.json", "w") as file:
-        json.dump(url, file, indent=4)
+    new_url = Url(
+        long_url=long_url,
+        code=code,
+        created_at=datetime.now().strftime("%d-%m-%y %H:%M:%S"),
+        clicks=0
+    )
 
-    BASE_URL = "http://127.0.0.1:8000"
-    short_url = f"{BASE_URL}/{code}"
-
-   # qr = qrcode.make(short_url)
-
-   # buffer = BytesIO()
-   # qr.save(buffer, format="PNG")
-
-   # img_base64 = base64.b64encode(buffer.getvalue()).decode()
-
+    db.add(new_url)
+    db.commit()
+    db.close()
+    short_url = f"http://127.0.0.1:8000/{code}"
     return render_home(short_url=short_url)
     
 @app.get("/all", response_class=HTMLResponse)
@@ -256,11 +245,14 @@ def all_links():
 
     rows = ""
 
-    for i, (code, data) in enumerate(url.items(), start=1):
-        short_url = f"http://127.0.0.1:8000/{code}"
-        long_url = data["long_url"]
-        created_at = data["created_at"]
-
+    db = sessionlocal()
+    all_urls = db.query(Url).all()
+    for i, data in enumerate(all_urls, start=1):
+        code = data.code
+        short_url = f"http://127.0.0.1:8000/{data.code}"
+        long_url = data.long_url
+        created_at = data.created_at
+        clicks = data.clicks
         rows += f"""
         <tr>
             <td>{i}</td>
@@ -270,13 +262,15 @@ def all_links():
                     {short_url}
                 </a>
             </td>
+            <td>{clicks}</td>
             <td>{created_at}</td>
+           
             <td class="delete">
                 <a href="/delete/{code}">delete</a>
             </td>
         </tr>
         """
-
+    db.close()
     return f"""
     <!DOCTYPE html>
     <html>
@@ -385,8 +379,8 @@ def all_links():
 
                 <div class="nav-links">
                 <a href="/">Home</a>
-                <a href="/all">My Links</a>
-                <a href="#">About</a>
+                <a href="/all"> My Links</a>
+                <a href="#"> About</a>
             </div>
         </div>
         <div class="top-bar">
@@ -403,6 +397,7 @@ def all_links():
                 <th>#</th>
                 <th>Original URL</th>
                 <th>Short URL</th>
+                <th>Clicks</th>
                 <th>created at</th>
                 <th>Action</th>
             </tr>
@@ -416,19 +411,30 @@ def all_links():
     """   
 @app.get("/delete/{code}")
 def delete_link(code: str):
-    if code in url:
-        del url[code]
+    db = sessionlocal()
 
-        with open("data.json", "w") as file:
-            json.dump(url, file, indent=4)
+    data = db.query(Url).filter(Url.code == code).first()
+
+    if data:
+        db.delete(data)
+        db.commit()
+
+    db.close()
 
     return RedirectResponse("/all", status_code=303)
 
 @app.get("/{code}")
 def redirect(code: str):
-    data = url.get(code)
+    db = sessionlocal()
+    data = db.query(Url).filter(Url.code == code).first()
 
     if data:
-        return RedirectResponse(data["long_url"])
+        data.clicks = data.clicks + 1
+        db.commit()
 
+        long_url = data.long_url
+        db.close()
+
+        return RedirectResponse(long_url)
+    db.close()
     return {"error": "Invalid code"}
