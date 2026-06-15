@@ -1,12 +1,16 @@
-from sqlalchemy import Column,Integer,String
+from sqlalchemy import Column,Integer,String, column
 from db import base
 
-class URL(base):
+class Url(base):
 
 	__tablename__ = "urls"
 
 	id = Column(Integer,primary_key=True,index=True)
 
-	long_code = Column(String)
+	long_url = Column(String)
 
-	short_code = Column(String,index=True,unique=True)
+	code = Column(String,index=True,unique=True)
+
+	created_at = Column(String)
+
+	clicks = Column(Integer, default=0)
