@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyLink</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="links-page">
+        <div class="navbar" style="background: linear-gradient(to right,#091B43,#101B45);">
+            <div class="logo">🔗 URL Shortener</div>
+
+                <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/all"> My Links</a>
+                <a href="#"> About</a>
+            </div>
+        </div>
+        <div class="top-bar">
+            <h1>My Links</h1>
+            <a href="/" style="text-decoration: none;">
+                <button class="new-btn">
+                    <img src="https://img.icons8.com/ios-glyphs/30/ffffff/plus-math.png"/>
+                    New Shorten URL
+                </button>
+            </a>
+        </div>
+    <table>
+        <tr>
+                <th>#</th>
+                <th>Original URL</th>
+                <th>Short URL</th>
+                <th>Clicks</th>
+                <th>created at</th>
+                <th>Action</th>
+            </tr>
+            {% for data in all_urls %}
+            <tr>
+                <td>{{ loop.index }}</td>
+
+                <td>{{ data.long_url }}</td>
+
+            <td>
+                <a href="http://127.0.0.1:8000/{{ data.code }}" target="_blank">
+                     http://127.0.0.1:8000/{{ data.code }}
+                </a>
+            </td>
+
+            <td>{{ data.clicks }}</td>
+
+            <td>{{ data.created_at }}</td>
+
+            <td>
+            <a href="/delete/{{ data.code }}"> Delete </a>
+            </td>
+        </tr>
+            {% endfor %}  
+    </table>
+</body>
+</html>

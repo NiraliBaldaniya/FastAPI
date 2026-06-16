@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastLink</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="home-page">
+    <div class="navbar">
+        <div class="logo">🔗 URL Shortener</div>
+        <div class="nav-links">
+           <a href="#"> Home</a>
+           <a href="/all"> My Links</a>
+           <a href="#"> About</a>
+        </div>
+        </div>
+            <h1>URL Shortener</h1>
+            <p>enter long url to generate short url</p>
+        <div class="box">
+            <h2>Enter Long URL</h2>
+            <form action="/generate" method="get">
+            <div class="input-box">
+            
+                <input type="text" name="long_url" placeholder="https://www.example.com" required>
+                </div>
+                <button type="submit" class="btn">🔗 Shorten URL</button>
+            </form>
+        </div>
+    {% if short_url %}
+    <div class="result">
+        <div class="url-info">
+            <h2 style="color:#16a34a;">Your short URL</h2>
+
+            <a href="{{ short_url }}" target="_blank"
+            style="color:white; font-size:20px; padding:7px; text-decoration:none;">
+            {{ short_url }}
+            </a>
+        </div>
+
+        <button class="copy-btn" onclick="copyurl('{{ short_url }}')">
+            Copy
+        </button>
+        <p id="copy-message" class="copy-message">copied to clipboard!</p>
+    </div>
+    {% endif %}
+</body>
+<script>
+
+    function copyurl(url) {
+    navigator.clipboard.writeText(url);
+
+    const btn = document.querySelector(".copy-btn");
+
+    btn.innerText = "✔ Copied";
+
+    setTimeout(() => {
+        btn.innerText = "Copy";
+    }, 2000);
+    }
+
+</script>
+</html>
