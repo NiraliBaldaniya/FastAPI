@@ -39,7 +39,6 @@ def shortner(request: Request, long_url: str):
    )
 
     db = sessionlocal()
-
     new_url = Url(
         long_url=long_url,
         code=code,
@@ -64,7 +63,10 @@ def all_links(request: Request):
 
     return templates.TemplateResponse(
         "all_links.html",
-        { "request": request, "all_urls": all_urls }
+        { 
+            "request": request,
+            "all_urls": all_urls 
+        }
     )
   
 @app.get("/delete/{code}")
