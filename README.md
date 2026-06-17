@@ -30,33 +30,34 @@ It converts long URLs into short and easy-to-share links.
 -  Run the following command in your terminal.
 ```
 pip install -r requirements.txt
-
+```
 
 -  Clone the repository to your local system.
 
 -  Enter into the project directory.
 ```
 cd url_shortener
-
+```
 
 -  Create Virtual Environment by running following command.
 ```
 python -m venv venv
+```
 
 -install requirements  
 ```
 pip install -r requirements.txt
-
+```
 
 -  Run the application using following command.
 ```
 uvicorn app:app --reload
-
+```
 
 -  Open your browser and visit:
 ```
 http://127.0.0.1:8000
-
+```
 
 -  Hola, It's running !! 🚀
 
