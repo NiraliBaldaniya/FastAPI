@@ -1,6 +1,6 @@
 __pycache__
 venv
-.env
 *.pyc
+.env
 .vscode
 urls.db
