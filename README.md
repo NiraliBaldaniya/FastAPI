@@ -44,11 +44,6 @@ cd url_shortener
 python -m venv venv
 ```
 
--install requirements  
-```
-pip install -r requirements.txt
-```
-
 -  Run the application using following command.
 ```
 uvicorn app:app --reload
