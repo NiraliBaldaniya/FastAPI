@@ -100,4 +100,4 @@ def redirect(code: str):
     
     db.close()
 
-    return {"error": "Invalid code"}
+    return {"error": "Not Supported"}
